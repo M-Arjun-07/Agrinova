@@ -1,1 +1,11 @@
-All the backends works done here 
+# Agrinova: Sustainable Farming Sim Game
+
+## Setup
+1. Create Supabase project.
+2. In backend: npm install && npm start
+3. Run schema.sql in Supabase.
+
+## Folders
+- backend: Node.js API
+- database: SQL schemas
+- etc.
