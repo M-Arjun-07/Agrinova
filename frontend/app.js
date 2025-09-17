@@ -12,16 +12,21 @@ const gameData = {
     red: {name:"Red Soil",color:"#A0522D",emoji:"⛰️",nutrients:{N:25,P:30,K:35}},
     desert: {name:"Desert Soil",color:"#F4E4BC",emoji:"🌵",nutrients:{N:10,P:12,K:15}}
   },
+
+  
   crops: {
-    rice: {name:"Rice",emoji:"🌾",seedCost:8,growthTime:20000,stages:4},
-    wheat: {name:"Wheat",emoji:"🌾",seedCost:10,growthTime:15000,stages:4},
-    cotton: {name:"Cotton",emoji:"🤍",seedCost:15,growthTime:30000,stages:4},
-    groundnut: {name:"Groundnut",emoji:"🥜",seedCost:6,growthTime:12000,stages:4}
+  rice:   {name:"Rice",emoji:"🌾",seedCost:8,growthTime:20000,stages:4, fertilizerNeed: 80},
+  wheat:  {name:"Wheat",emoji:"🌾",seedCost:10,growthTime:15000,stages:4, fertilizerNeed: 60},
+  cotton: {name:"Cotton",emoji:"🤍",seedCost:15,growthTime:30000,stages:4, fertilizerNeed: 100},
+  groundnut: {name:"Groundnut",emoji:"🥜",seedCost:6,growthTime:12000,stages:4, fertilizerNeed: 40}
   }
 };
 
 // Game State
 let gameState = {
+
+  fertilizerMeter: 0,   // current field fertilizer level
+  maxFertilizer: 100,   // cap for fertilizer
   currentScreen: 'splash',
   selectedSoil: null,
   selectedTool: 'plough',
@@ -377,8 +382,7 @@ function plantSeed(x, y) {
     showMessage("You need to plough the soil first!");
     return;
   }
-  
-  // Check minimum distance from other crops
+
   const minDistance = 30;
   for (let crop of gameState.crops) {
     if (distance(x, y, crop.x, crop.y) < minDistance) {
@@ -386,57 +390,54 @@ function plantSeed(x, y) {
       return;
     }
   }
-  
+
   const cropData = gameData.crops[gameState.selectedCrop];
-  
-  // Check money
+
   if (gameState.money < cropData.seedCost) {
     showMessage(`Need more coins! ${cropData.name} seeds cost 💰${cropData.seedCost}`);
     return;
   }
-  
-  // Deduct cost
+
   gameState.money -= cropData.seedCost;
-  
-  // Plant at exact coordinates
+
   const newCrop = {
     id: generateID(),
     type: gameState.selectedCrop,
     x: x,
     y: y,
     stage: 0,
-    plantedTime: Date.now(),
     size: 2,
     rotation: Math.random() * 360,
     health: 100,
     watered: false,
     fertilized: false,
-    growthProgress: 0
+    pestControlled: false,
+    growthPoints: 0,
+    thresholds: { sprout: 10, mature: 25, harvest: 40 } // NEW growth thresholds
   };
-  
+
   gameState.crops.push(newCrop);
   gameState.stats.planted++;
-  
+
   console.log(`Planted ${cropData.name} at ${x}, ${y}`);
-  
   updateUI();
   showMessage(`${cropData.name} planted!`);
 }
 
+
 function waterArea(x, y) {
   createWaterEffect(x, y);
-  
-  // Water nearby crops
   let wateredCount = 0;
+
   gameState.crops.forEach(crop => {
-    const dist = distance(x, y, crop.x, crop.y);
-    if (dist <= 40) {
+    if (distance(x, y, crop.x, crop.y) <= 40) {
       crop.watered = true;
-      crop.health = Math.min(100, crop.health + 10);
+      crop.growthPoints += 5;  // 💧 Water adds growth
       wateredCount++;
+      checkGrowth(crop);
     }
   });
-  
+
   if (wateredCount > 0) {
     showMessage(`💧 Watered ${wateredCount} crops!`);
   } else {
@@ -444,35 +445,38 @@ function waterArea(x, y) {
   }
 }
 
+
 function applyFertilizer(x, y) {
-  if (gameState.money < 15) {
-    showMessage("Need more coins for fertilizer!");
+  if (gameState.money < 25) { // make it a bit costlier since it’s field-wide
+    showMessage("Not enough coins for fertilizer!");
     return;
   }
-  
-  gameState.money -= 15;
+
+  gameState.money -= 25;
+  gameState.fertilizerMeter = Math.min(gameState.maxFertilizer, gameState.fertilizerMeter + 50);
+
   createFertilizerEffect(x, y);
-  
-  // Fertilize nearby crops
-  let fertilizedCount = 0;
+
+  // Boost all crops in the field
+  let boosted = 0;
   gameState.crops.forEach(crop => {
-    const dist = distance(x, y, crop.x, crop.y);
-    if (dist <= 50) {
-      crop.fertilized = true;
-      crop.health = Math.min(100, crop.health + 20);
-      crop.growthBoost = 1.5;
-      fertilizedCount++;
-    }
+    const cropData = gameData.crops[crop.type];
+    
+    // Calculate boost based on acceptancy
+    const acceptancy = Math.min(1, gameState.fertilizerMeter / cropData.fertilizerNeed);
+    
+    crop.fertilized = true;
+    crop.growthRate += 0.5 * acceptancy;   // better acceptancy = higher boost
+    crop.health = Math.min(100, crop.health + 10 * acceptancy);
+    
+    boosted++;
   });
-  
+
   updateUI();
-  
-  if (fertilizedCount > 0) {
-    showMessage(`✨ Fertilized ${fertilizedCount} crops!`);
-  } else {
-    showMessage("✨ Fertilizer applied!");
-  }
+  showMessage(`✨ Fertilized the whole field! ${boosted} crops boosted.`);
 }
+
+
 
 function harvestCrop(x, y) {
   for (let i = 0; i < gameState.crops.length; i++) {
@@ -498,6 +502,20 @@ function harvestCrop(x, y) {
   }
   
   showMessage("No mature crops here to harvest!");
+}
+function checkGrowth(crop) {
+  if (crop.growthPoints >= crop.thresholds.sprout && crop.stage === 0) {
+    crop.stage = 1; // seed → sprout
+    showMessage(`${gameData.crops[crop.type].name} has sprouted! 🌱`);
+  }
+  if (crop.growthPoints >= crop.thresholds.mature && crop.stage === 1) {
+    crop.stage = 2; // sprout → mature
+    showMessage(`${gameData.crops[crop.type].name} is growing strong! 🌾`);
+  }
+  if (crop.growthPoints >= crop.thresholds.harvest && crop.stage === 2) {
+    crop.stage = 3; // mature → ready to harvest
+    showMessage(`${gameData.crops[crop.type].name} is ready to harvest! 🎉`);
+  }
 }
 
 // Visual Effects
@@ -806,33 +824,28 @@ function startGameLoop() {
 }
 
 function updateCropGrowth() {
+  const now = Date.now();
+
+  // Fertilizer meter decays
+  if (gameState.fertilizerMeter > 0) {
+    gameState.fertilizerMeter = Math.max(0, gameState.fertilizerMeter - 0.5); // slow decay
+  }
+
   gameState.crops.forEach(crop => {
-    const cropData = gameData.crops[crop.type];
-    const timeGrown = Date.now() - crop.plantedTime;
-    
-    // Calculate growth progress (0 to 1)
-    let growthRate = 1;
-    if (crop.watered) growthRate *= 1.2;
-    if (crop.fertilized) growthRate *= (crop.growthBoost || 1.5);
-    
-    crop.growthProgress = Math.min(1, (timeGrown * growthRate) / cropData.growthTime);
-    
-    // Update visual size based on growth
-    crop.size = 2 + (crop.growthProgress * 18);
-    
-    // Update growth stage
-    crop.stage = Math.floor(crop.growthProgress * 4);
-    
-    // Add natural sway animation
+    if (crop.growthRate > 0 && crop.stage < 3) {
+      const elapsed = (now - crop.lastUpdated) / 1000;
+      crop.growthPoints += elapsed * crop.growthRate;
+      crop.lastUpdated = now;
+      checkGrowth(crop);
+    }
+    crop.size = 2 + (crop.growthPoints / crop.thresholds.harvest) * 18;
     crop.sway = Math.sin(Date.now() * 0.001 + parseInt(crop.id.substr(-3))) * 2;
-    
-    // Reset watered status periodically
-    if (Math.random() < 0.1) crop.watered = false;
   });
-  
-  // Update stats
+
   gameState.stats.growing = gameState.crops.filter(c => c.stage < 3).length;
 }
+
+
 
 // UI Functions
 function updateUI() {
@@ -936,7 +949,7 @@ function initApp() {
       showScreen('soil-screen');
     });
   }
-   const gameScreen = document.getElementById('game-screen');
+  const gameScreen = document.getElementById('game-screen');
   if (gameScreen) {
     gameScreen.addEventListener('show', loadSaves); // Custom event or call from showScreen
   }
