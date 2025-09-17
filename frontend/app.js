@@ -369,8 +369,9 @@ function handleToolAction(x, y) {
       waterArea(x, y);
       break;
     case 'fertilizer':
-      applyFertilizer(x, y);
+      applyFertilizerToField();
       break;
+
     case 'harvest':
       harvestCrop(x, y);
       break;
@@ -401,20 +402,22 @@ function plantSeed(x, y) {
   gameState.money -= cropData.seedCost;
 
   const newCrop = {
-    id: generateID(),
-    type: gameState.selectedCrop,
-    x: x,
-    y: y,
-    stage: 0,
-    size: 2,
-    rotation: Math.random() * 360,
-    health: 100,
-    watered: false,
-    fertilized: false,
-    pestControlled: false,
-    growthPoints: 0,
-    thresholds: { sprout: 10, mature: 25, harvest: 40 } // NEW growth thresholds
-  };
+  id: generateID(),
+  type: gameState.selectedCrop,
+  x: x,
+  y: y,
+  stage: 0,              // start as seed
+  plantedTime: Date.now(),
+  size: 2,
+  rotation: Math.random() * 360,
+  health: 100,
+  watered: false,
+  fertilized: false,
+  growthProgress: 0,
+  fertilizedTime: null,
+  fertilizerDuration: 0
+};
+
 
   gameState.crops.push(newCrop);
   gameState.stats.planted++;
@@ -446,35 +449,40 @@ function waterArea(x, y) {
 }
 
 
-function applyFertilizer(x, y) {
-  if (gameState.money < 25) { // make it a bit costlier since it’s field-wide
-    showMessage("Not enough coins for fertilizer!");
+function applyFertilizerToField() {
+  if (gameState.money < 15) {
+    showMessage("Need more coins for fertilizer!");
     return;
   }
 
-  gameState.money -= 25;
-  gameState.fertilizerMeter = Math.min(gameState.maxFertilizer, gameState.fertilizerMeter + 50);
+  gameState.money -= 15;
 
-  createFertilizerEffect(x, y);
+  // Visual effect at center of canvas
+  createFertilizerEffect(gameState.canvas.width / 2, gameState.canvas.height / 2);
 
-  // Boost all crops in the field
-  let boosted = 0;
+  let fertilizedCount = 0;
+
   gameState.crops.forEach(crop => {
-    const cropData = gameData.crops[crop.type];
-    
-    // Calculate boost based on acceptancy
-    const acceptancy = Math.min(1, gameState.fertilizerMeter / cropData.fertilizerNeed);
-    
-    crop.fertilized = true;
-    crop.growthRate += 0.5 * acceptancy;   // better acceptancy = higher boost
-    crop.health = Math.min(100, crop.health + 10 * acceptancy);
-    
-    boosted++;
+    // Only fertilize crops that already exist
+    if (!crop.fertilized) {
+      crop.fertilized = true;
+      crop.fertilizedTime = Date.now();
+      crop.fertilizerDuration = 10000; // lasts 10s
+      crop.health = Math.min(100, crop.health + 20);
+      fertilizedCount++;
+    }
   });
 
   updateUI();
-  showMessage(`✨ Fertilized the whole field! ${boosted} crops boosted.`);
+
+  if (fertilizedCount > 0) {
+    showMessage(`✨ Fertilized ${fertilizedCount} crops!`);
+  } else {
+    showMessage("✨ No crops to fertilize right now!");
+  }
 }
+
+
 
 
 
@@ -753,11 +761,12 @@ function drawCrops() {
     
     // Draw crop based on growth stage
     if (crop.stage === 0) {
-      // Seedling - small green dot
-      ctx.fillStyle = '#4CAF50';
-      ctx.beginPath();
-      ctx.arc(0, 0, crop.size, 0, 2 * Math.PI);
-      ctx.fill();
+    ctx.fillStyle = '#4CAF50';
+    ctx.beginPath();
+    ctx.arc(0, 0, 3, 0, 2 * Math.PI); // very small dot
+    ctx.fill();
+
+
     } else if (crop.stage === 1) {
       // Young plant - small stem
       ctx.strokeStyle = '#4CAF50';
@@ -824,26 +833,55 @@ function startGameLoop() {
 }
 
 function updateCropGrowth() {
-  const now = Date.now();
-
-  // Fertilizer meter decays
-  if (gameState.fertilizerMeter > 0) {
-    gameState.fertilizerMeter = Math.max(0, gameState.fertilizerMeter - 0.5); // slow decay
-  }
-
   gameState.crops.forEach(crop => {
-    if (crop.growthRate > 0 && crop.stage < 3) {
-      const elapsed = (now - crop.lastUpdated) / 1000;
-      crop.growthPoints += elapsed * crop.growthRate;
-      crop.lastUpdated = now;
-      checkGrowth(crop);
+    const cropData = gameData.crops[crop.type];
+
+    // Skip growth if no external help
+    if (!crop.watered && !crop.fertilized) {
+      return; // stays in current stage until acted on
     }
-    crop.size = 2 + (crop.growthPoints / crop.thresholds.harvest) * 18;
+
+    // Calculate growth rate
+    let growthRate = 0; // default no growth
+    if (crop.watered) growthRate += 0.5;        // watered gives growth
+    if (crop.fertilized) growthRate += 1.0;     // fertilizer gives stronger boost
+
+    // Increase growth progress proportional to rate
+    crop.growthProgress = Math.min(1, crop.growthProgress + (growthRate / cropData.growthTime) * 1000);
+
+    // Update size visually
+    crop.size = 2 + (crop.growthProgress * 18);
+
+    // Stage calculation
+    if (crop.growthProgress < 0.2) {
+      crop.stage = 0; // seed
+    } else if (crop.growthProgress < 0.5) {
+      crop.stage = 1; // sprout
+    } else if (crop.growthProgress < 0.8) {
+      crop.stage = 2; // young plant
+    } else {
+      crop.stage = 3; // mature
+    }
+
+    // Add natural sway effect
     crop.sway = Math.sin(Date.now() * 0.001 + parseInt(crop.id.substr(-3))) * 2;
+
+    // Reset watered over time
+    if (crop.watered && Math.random() < 0.05) {
+      crop.watered = false;
+    }
+
+    // Reset fertilizer when duration ends
+    if (crop.fertilized && crop.fertilizedTime && Date.now() - crop.fertilizedTime > crop.fertilizerDuration) {
+      crop.fertilized = false;
+    }
   });
 
+  // Update stats
   gameState.stats.growing = gameState.crops.filter(c => c.stage < 3).length;
 }
+
+
 
 
 
