@@ -140,5 +140,3 @@ E:.
 2. Backend: `cd backend`, `npm install`, add .env vars, `npm start` (runs on localhost:3000).
 3. Test: Use Postman for /login (get token), then /saves (create/load with soil_type).
 4. Next: Integrate frontend Phaser for UI (soil selection, MS Paint-style farm view). Add more game logic (e.g., soil bonuses in score calc).
-
-If anything's missing or needs tweaks (e.g., add more tests), let me know!
