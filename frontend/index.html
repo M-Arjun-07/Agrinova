@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriNova - Organic Farming Simulator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div id="splash" class="screen active">
+        <div class="splash-content">
+            <h1 class="game-title">🌱 AgriNova</h1>
+            <p class="game-subtitle">Organic Farming Simulator</p>
+            <p class="game-description">Experience truly organic farming with continuous fields, natural ploughing, and free-form planting!</p>
+            <div class="splash-buttons">
+                <button class="btn btn--primary" id="start-btn">🌾 Start Farming</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Soil Selection Screen -->
+    <div id="soil-screen" class="screen">
+        <div class="soil-content">
+            <h2 class="screen-title">🌱 Choose Your Soil Type</h2>
+            <div class="soils-grid">
+                <div class="soil-card" data-soil="alluvial">
+                    <div class="soil-header">
+                        <div class="soil-icon">🏞️</div>
+                        <div class="soil-name">Alluvial Soil</div>
+                        <div class="soil-desc">Fertile river deposits</div>
+                    </div>
+                    <div class="soil-nutrients">
+                        <div class="nutrient-bar">
+                            <span class="nutrient-label">N:</span>
+                            <div class="nutrient-progress"><div class="nutrient-fill" style="width: 40%"></div></div>
+                            <span class="nutrient-value">40</span>
+                        </div>
+                        <div class="nutrient-bar">
+                            <span class="nutrient-label">P:</span>
+                            <div class="nutrient-progress"><div class="nutrient-fill" style="width: 35%"></div></div>
+                            <span class="nutrient-value">35</span>
+                        </div>
+                        <div class="nutrient-bar">
+                            <span class="nutrient-label">K:</span>
+                            <div class="nutrient-progress"><div class="nutrient-fill" style="width: 45%"></div></div>
+                            <span class="nutrient-value">45</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="soil-card" data-soil="black">
+                    <div class="soil-header">
+                        <div class="soil-icon">🌿</div>
+                        <div class="soil-name">Black Soil</div>
+                        <div class="soil-desc">Rich volcanic soil</div>
+                    </div>
+                    <div class="soil-nutrients">
+                        <div class="nutrient-bar">
+                            <span class="nutrient-label">N:</span>
+                            <div class="nutrient-progress"><div class="nutrient-fill" style="width: 55%"></div></div>
+                            <span class="nutrient-value">55</span>
+                        </div>
+                        <div class="nutrient-bar">
+                            <span class="nutrient-label">P:</span>
+                            <div class="nutrient-progress"><div class="nutrient-fill" style="width: 45%"></div></div>
+                            <span class="nutrient-value">45</span>
+                        </div>
+                        <div class="nutrient-bar">
+                            <span class="nutrient-label">K:</span>
+                            <div class="nutrient-progress"><div class="nutrient-fill" style="width: 50%"></div></div>
+                            <span class="nutrient-value">50</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="soil-card" data-soil="red">
+                    <div class="soil-header">
+                        <div class="soil-icon">⛰️</div>
+                        <div class="soil-name">Red Soil</div>
+                        <div class="soil-desc">Iron-rich lateritic</div>
+                    </div>
+                    <div class="soil-nutrients">
+                        <div class="nutrient-bar">
+                            <span class="nutrient-label">N:</span>
+                            <div class="nutrient-progress"><div class="nutrient-fill" style="width: 25%"></div></div>
+                            <span class="nutrient-value">25</span>
+                        </div>
+                        <div class="nutrient-bar">
+                            <span class="nutrient-label">P:</span>
+                            <div class="nutrient-progress"><div class="nutrient-fill" style="width: 30%"></div></div>
+                            <span class="nutrient-value">30</span>
+                        </div>
+                        <div class="nutrient-bar">
+                            <span class="nutrient-label">K:</span>
+                            <div class="nutrient-progress"><div class="nutrient-fill" style="width: 35%"></div></div>
+                            <span class="nutrient-value">35</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="soil-card" data-soil="desert">
+                    <div class="soil-header">
+                        <div class="soil-icon">🌵</div>
+                        <div class="soil-name">Desert Soil</div>
+                        <div class="soil-desc">Arid sandy soil</div>
+                    </div>
+                    <div class="soil-nutrients">
+                        <div class="nutrient-bar">
+                            <span class="nutrient-label">N:</span>
+                            <div class="nutrient-progress"><div class="nutrient-fill" style="width: 10%"></div></div>
+                            <span class="nutrient-value">10</span>
+                        </div>
+                        <div class="nutrient-bar">
+                            <span class="nutrient-label">P:</span>
+                            <div class="nutrient-progress"><div class="nutrient-fill" style="width: 12%"></div></div>
+                            <span class="nutrient-value">12</span>
+                        </div>
+                        <div class="nutrient-bar">
+                            <span class="nutrient-label">K:</span>
+                            <div class="nutrient-progress"><div class="nutrient-fill" style="width: 15%"></div></div>
+                            <span class="nutrient-value">15</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn--outline" id="soil-back-btn">← Back</button>
+        </div>
+    </div>
+
+    <!-- Main Game Screen -->
+    <div id="game-screen" class="screen">
+        <!-- Top HUD Bar -->
+        <div class="hud-bar">
+            <div class="hud-left">
+                <div class="coins">
+                    <span class="coin-icon">💰</span>
+                    <span class="coin-count">200</span>
+                </div>
+            </div>
+            <div class="hud-center">
+                <div class="tools">
+                    <div class="tool selected" data-tool="plough" title="Plough - Click and drag to till soil">🚜</div>
+                    <div class="tool" data-tool="plant" title="Plant - Click anywhere on ploughed soil">🌱</div>
+                    <div class="tool" data-tool="water" title="Water - Click to water crops">💧</div>
+                    <div class="tool" data-tool="fertilizer" title="Fertilizer - Click to apply nutrients">✨</div>
+                    <div class="tool" data-tool="harvest" title="Harvest - Click mature crops">🌾</div>
+                </div>
+            </div>
+            <div class="hud-right">
+                <div class="crop-selector">
+                    <select id="crop-select" class="form-control">
+                        <option value="rice">🌾 Rice (💰8)</option>
+                        <option value="wheat">🌾 Wheat (💰10)</option>
+                        <option value="cotton">🤍 Cotton (💰15)</option>
+                        <option value="groundnut">🥜 Groundnut (💰6)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Area -->
+        <div class="game-area">
+            <!-- Farm Field Canvas -->
+            <div class="farm-field">
+                <canvas id="field-canvas" width="800" height="600"></canvas>
+                <div class="field-instructions" id="field-instructions">
+                    <div class="instruction-text">🚜 Click and drag to plough your field organically!</div>
+                </div>
+            </div>
+
+            <!-- Side Panel -->
+            <div class="side-panel">
+                <div class="panel-section">
+                    <h3>🌾 Current Tool</h3>
+                    <div class="current-tool" id="current-tool">
+                        <div class="tool-icon">🚜</div>
+                        <div class="tool-name">Plough</div>
+                        <div class="tool-desc">Click and drag to create organic furrows</div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>📊 Farm Stats</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Planted:</span>
+                            <span class="stat-value" id="planted-count">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Growing:</span>
+                            <span class="stat-value" id="growing-count">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Harvested:</span>
+                            <span class="stat-value" id="harvested-count">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Earnings:</span>
+                            <span class="stat-value" id="total-earnings">💰0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>🌱 Growing Crops</h3>
+                    <div class="growing-crops" id="growing-crops">
+                        <div class="no-crops">No crops growing yet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Popup -->
+    <div id="message-popup" class="modal hidden">
+        <div class="modal-content">
+            <p class="message-text" id="message-text"></p>
+            <button class="btn btn--primary" id="message-btn">OK</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
