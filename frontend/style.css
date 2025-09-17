@@ -1403,3 +1403,44 @@ body {
     margin-bottom: var(--space-12);
   }
 }
+.saves-panel {
+  margin-top: 12px;
+  background: #fcf9f5;
+  border-radius: 8px;
+  min-height: 60px;
+  padding: 8px;
+}
+
+.save-entry {
+  padding: 6px 8px;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.save-entry:last-child {
+  border-bottom: none;
+}
+
+.save-title {
+  font-weight: bold;
+  color: #7b5f32;
+}
+
+.save-meta {
+  font-size: 0.9em;
+  color: #555;
+  display: flex;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.saves-empty {
+  color: #aaa;
+  font-style: italic;
+  padding: 5px;
+}
+
+.saves-btn {
+  margin-top: 8px;
+  width: 100%;
+  font-size: 1em;
+}

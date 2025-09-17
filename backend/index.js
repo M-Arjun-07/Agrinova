@@ -21,99 +21,64 @@ app.get('/', (req, res) => {
 
 // Auth middleware
 const authMiddleware = async (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'No token' });
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-    if (error) return res.status(401).json({ error: 'Invalid token' });
-    req.user = user;
-    next();
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'No token' });
+  const { data: { user }, error } = await supabase.auth.getUser(token);
+  if (error) return res.status(401).json({ error: 'Invalid token' });
+  req.user = user;
+  next();
 };
 
-// Sign-up
+// User profile with saves and leaderboard
 app.get('/user', authMiddleware, async (req, res) => {
-    const { data: saves, error: savesError } = await supabase
-        .from('farms')
-        .select('*')
-        .eq('user_id', req.user.id)
-        .order('created_at', { ascending: false });
+  const { data: saves, error: savesError } = await supabase
+    .from('farms')
+    .select('*')
+    .eq('user_id', req.user.id)
+    .order('created_at', { ascending: false });
 
-    if (savesError) return res.status(400).json({ error: savesError.message });
+  if (savesError) return res.status(400).json({ error: savesError.message });
 
-    const { data: leaderboard, error: lbError } = await supabase
-        .from('leaderboards')
-        .select('*')
-        .eq('user_id', req.user.id)
-        .single();
+  const { data: leaderboard, error: lbError } = await supabase
+    .from('leaderboards')
+    .select('*')
+    .eq('user_id', req.user.id)
+    .single();
 
-    res.json({
-        user: {
-        id: req.user.id,
-        email: req.user.email,
-        },
-        saves: saves || [],  // Array of worlds/farms
-        leaderboard: leaderboard || { score: 0, badges: [] },
-    });
+  res.json({
+    user: {
+      id: req.user.id,
+      email: req.user.email,
+    },
+    saves: saves || [],
+    leaderboard: leaderboard || { score: 0, badges: [] },
+  });
 });
 
-// Login
-app.get('/saves', authMiddleware, async (req, res) => {
+// List saves - requires auth for user-specific saves
+app.get('/saves', async (req, res) => {
   const { data, error } = await supabase
     .from('farms')
-    .select('id, save_name, soil_type, created_at, sustainability_score')  // Summary for list
-    .eq('user_id', req.user.id)
+    .select('id, save_name, soil_type, created_at, sustainability_score')
+    // .eq('user_id', req.user.id)
     .order('created_at', { ascending: false });
   if (error) return res.status(400).json({ error: error.message });
   res.json(data);
 });
 
-// Save farm state
-app.post('/farms', authMiddleware, async (req, res) => {
-    const { crop_type, choices } = req.body;
-    let sustainability_score = 0;
-    if (choices.fertilizer === 'organic') sustainability_score += 10;
-    if (choices.irrigation === 'drip') sustainability_score += 10;
-    if (choices.pest_control === 'natural') sustainability_score += 10;
-    // Add more rules (e.g., crop rotation)
-
-    const { data, error } = await supabase
-        .from('farms')
-        .insert({
-        user_id: req.user.id,
-        crop_type,
-        sustainability_score,
-        choices,
-        yield: Math.floor(sustainability_score * Math.random() * 10) + 50 // Randomized yield for fun
-        })
-        .select();
-    if (error) return res.status(400).json({ error: error.message });
-    res.json(data[0]);
-});
-
-// List Saves (GET /saves: returns user's saves for choice prompt)
-app.get('/saves', authMiddleware, async (req, res) => {
-    const { data, error } = await supabase
-    .from('farms')
-    .select('id, save_name, soil_type, created_at, sustainability_score')  // Summary for list
-    .eq('user_id', req.user.id)
-    .order('created_at', { ascending: false });
-    if (error) return res.status(400).json({ error: error.message });
-    res.json(data);
-});
-
-// Create New Save (POST /saves: for new game with soil_type)
-app.post('/saves', authMiddleware, async (req, res) => {
+// Create new save - requires auth
+app.post('/saves', async (req, res) => {
   const { save_name = 'New Farm', soil_type, crop_type, choices } = req.body;
   if (!soil_type) return res.status(400).json({ error: 'soil_type required' });
 
   let sustainability_score = 0;
-  // Existing logic + soil bonuses? e.g.,
   if (soil_type === 'alluvial' && choices?.fertilizer === 'organic') sustainability_score += 5;
-  // Add more game rules...
+  // Additional scoring logic can be added here
 
   const { data, error } = await supabase
     .from('farms')
     .insert({
-      user_id: req.user.id,
+      user_id: null,
       save_name,
       soil_type,
       crop_type,
@@ -126,24 +91,25 @@ app.post('/saves', authMiddleware, async (req, res) => {
   res.json(data[0]);
 });
 
-// Get Specific Save (GET /saves/:id: for loading UI data)
+// Get specific save - requires auth
 app.get('/saves/:id', authMiddleware, async (req, res) => {
   const { data, error } = await supabase
     .from('farms')
     .select('*')
     .eq('id', req.params.id)
-    .eq('user_id', req.user.id)  // RLS enforces this
+    .eq('user_id', req.user.id)
     .single();
   if (error) return res.status(400).json({ error: error.message });
   if (!data) return res.status(404).json({ error: 'Save not found' });
   res.json(data);
 });
 
-// Update Save (PUT /saves/:id: e.g., after player choices, update state)
+// Update save - requires auth
 app.put('/saves/:id', authMiddleware, async (req, res) => {
   const { crop_type, choices } = req.body;
   let sustainability_score = 0;
-  // Recalculate based on choices + soil (fetch current soil)
+
+  // Fetch current save for soil info
   const { data: current, error: fetchError } = await supabase
     .from('farms')
     .select('soil_type')
@@ -152,11 +118,10 @@ app.put('/saves/:id', authMiddleware, async (req, res) => {
     .single();
   if (fetchError || !current) return res.status(400).json({ error: 'Save not found' });
 
-  // Example logic with soil
   if (choices.fertilizer === 'organic') sustainability_score += 10;
   if (choices.irrigation === 'drip') sustainability_score += 10;
   if (choices.pest_control === 'natural') sustainability_score += 10;
-  if (current.soil_type === 'black') sustainability_score += 5;  // Bonus for fertile soil
+  if (current.soil_type === 'black') sustainability_score += 5;
 
   const { data, error } = await supabase
     .from('farms')
@@ -170,67 +135,68 @@ app.put('/saves/:id', authMiddleware, async (req, res) => {
     .select();
   if (error) return res.status(400).json({ error: error.message });
 
-  // Optionally update leaderboard
+  // Update leaderboard entry
   await supabase
     .from('leaderboards')
     .upsert({
       user_id: req.user.id,
-      score: sustainability_score,  // Or increment
+      score: sustainability_score,
     }, { onConflict: 'user_id' });
-
+  
   res.json(data[0]);
 });
 
-// Get player's farms
+// Get player's farms (all fields) - requires auth
 app.get('/farms', authMiddleware, async (req, res) => {
-    const { data, error } = await supabase
-        .from('farms')
-        .select('*')
-        .eq('user_id', req.user.id);
-    if (error) return res.status(400).json({ error: error.message });
-    res.json(data);
+  const { data, error } = await supabase
+    .from('farms')
+    .select('*')
+    .eq('user_id', req.user.id);
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data);
 });
 
-// Leaderboard
+// Get leaderboard (top 10)
 app.get('/leaderboards', async (req, res) => {
   const { data, error } = await supabase
     .from('leaderboards')
-    .select('*') // Removed invalid join
+    .select('*')
     .order('score', { ascending: false })
     .limit(10);
   if (error) return res.status(400).json({ error: error.message });
   res.json(data);
 });
 
-// Update leaderboard
+// Update leaderboard - requires auth
 app.post('/leaderboards/update', authMiddleware, async (req, res) => {
-    const { score_increment, badge } = req.body;
-    const { data: current, error: fetchError } = await supabase
-        .from('leaderboards')
-        .select('score, badges')
-        .eq('user_id', req.user.id)
-        .single();
+  const { score_increment, badge } = req.body;
+  const { data: current, error: fetchError } = await supabase
+    .from('leaderboards')
+    .select('score, badges')
+    .eq('user_id', req.user.id)
+    .single();
 
-    if (fetchError && fetchError.code !== 'PGRST116') return res.status(400).json({ error: fetchError.message });
+  if (fetchError && fetchError.code !== 'PGRST116') return res.status(400).json({ error: fetchError.message });
 
-    const newScore = (current?.score || 0) + score_increment;
-    const newBadges = [...(current?.badges || []), badge].filter(Boolean);
+  const newScore = (current?.score || 0) + score_increment;
+  const newBadges = [...(current?.badges || []), badge].filter(Boolean);
 
-    const { data, error } = await supabase
-        .from('leaderboards')
-        .upsert({
-        user_id: req.user.id,
-        score: newScore,
-        badges: newBadges
-        }, { onConflict: 'user_id' })
-        .select();
-    if (error) return res.status(400).json({ error: error.message });
-    res.json(data[0]);
+  const { data, error } = await supabase
+    .from('leaderboards')
+    .upsert({
+      user_id: req.user.id,
+      score: newScore,
+      badges: newBadges,
+    }, { onConflict: 'user_id' })
+    .select();
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data[0]);
 });
 
 app.listen(port, () => {
-    console.log(`Agrinova Backend on http://localhost:${port}`);
+  console.log(`Agrinova Backend on http://localhost:${port}`);
 });
+
 
 // do not use these are for testing purposes only.
 // to create your own user, use own email id and passwords

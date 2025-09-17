@@ -80,6 +80,83 @@ function isOnPloughedSoil(x, y) {
   return false;
 }
 
+async function getSaves() {
+  try {
+    const res = await fetch('http://localhost:3000/saves'); // Change to production backend if needed
+    if (!res.ok) throw new Error('Failed to fetch saves');
+    return await res.json();
+  } catch (err) {
+    console.error('Error fetching saves:', err);
+    return [];
+  }
+}
+
+// Creates a new save in the backend
+async function createSave(saveObj) {
+  try {
+    const res = await fetch('http://localhost:3000/saves', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(saveObj),
+    });
+    if (!res.ok) throw new Error('Failed to create save');
+    return await res.json();
+  } catch (err) {
+    console.error('Error creating save:', err);
+    return null;
+  }
+}
+
+// --------- NEW: UI to show saves ---------
+
+// Renders the saves panel
+function renderSavesPanel(saves) {
+  const panel = document.getElementById('saves-panel');
+  if (!panel) return;
+  if (saves.length === 0) {
+    panel.innerHTML = '<div class="saves-empty">No saves yet</div>';
+    return;
+  }
+  panel.innerHTML = saves.map(save => `
+    <div class="save-entry">
+      <div class="save-title">${save.savename || 'Unnamed Farm'}</div>
+      <div class="save-meta">
+        <span>${save.soiltype || 'Unknown Soil'}</span>
+        <span>Score: ${save.sustainabilityscore || 0}</span>
+        <span>${new Date(save.createdat).toLocaleString()}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Fetch and show saves in UI
+async function loadSaves() {
+  const saves = await getSaves();
+  renderSavesPanel(saves);
+}
+
+// Handler to save current farm
+async function saveCurrentFarm() {
+  const saveObj = {
+    save_name: 'My Organic Farm ' + (new Date()).toLocaleTimeString(),
+    soil_type: gameState.selectedSoil,
+    crop_type: gameState.selectedCrop,
+    choices: {
+      fertilizer: 'organic', // or from player choices
+      irrigation: 'drip',
+      pestcontrol: 'natural',
+    },
+    stats: {...gameState.stats}
+  };
+  const result = await createSave(saveObj);
+  if (result && !result.error) {
+    showMessage('Farm saved successfully!');
+    loadSaves();
+  } else {
+    showMessage('Failed to save farm.');
+  }
+}
+
 // Screen Management
 function showScreen(screenId) {
   console.log(`Attempting to show screen: ${screenId}`);
@@ -859,7 +936,19 @@ function initApp() {
       showScreen('soil-screen');
     });
   }
-  
+   const gameScreen = document.getElementById('game-screen');
+  if (gameScreen) {
+    gameScreen.addEventListener('show', loadSaves); // Custom event or call from showScreen
+  }
+  // Load saves after DOM ready (for demo)
+  loadSaves();
+
+  // Save button handler
+  const saveBtn = document.getElementById('save-btn');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', saveCurrentFarm);
+  }
+
   // Soil selection
   document.querySelectorAll('.soil-card').forEach(card => {
     card.addEventListener('click', (e) => {
@@ -911,6 +1000,10 @@ function initApp() {
 
 // Start application when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOM loaded, starting AgriNova...');
   initApp();
+  // Attach Save button handler again in case panel is rendered after
+  const saveBtn = document.getElementById('save-btn');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', saveCurrentFarm);
+  }
 });
