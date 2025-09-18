@@ -1474,3 +1474,22 @@ body {
   border-radius: 8px;
   transition: width 0.3s ease-in-out;
 }
+#manualButton {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  z-index: 1000;
+  transition: background-color 0.3s ease;
+}
+
+#manualButton:hover {
+  background-color: #45a049;
+}

@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriNova - Complete Farming Manual</title>
+    <style>
+        /* Modern CSS Variables */
+        :root {
+            --primary-green: #2E7D32;
+            --secondary-green: #4CAF50;
+            --accent-gold: #FFD700;
+            --text-dark: #1B5E20;
+            --text-light: #388E3C;
+            --bg-light: #F1F8E9;
+            --bg-white: #FFFFFF;
+            --border-color: #C8E6C9;
+            --shadow: 0 4px 12px rgba(46, 125, 50, 0.15);
+            --gradient-primary: linear-gradient(135deg, #2E7D32, #4CAF50);
+            --gradient-secondary: linear-gradient(135deg, #81C784, #A5D6A7);
+        }
+
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--gradient-primary);
+            color: white;
+            text-align: center;
+            padding: 3rem 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="70" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="70" cy="80" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+            animation: float 20s linear infinite;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            z-index: 1;
+            position: relative;
+        }
+
+        .header .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            z-index: 1;
+            position: relative;
+        }
+
+        /* Navigation */
+        .nav-container {
+            background: var(--bg-white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .nav-item {
+            background: var(--gradient-secondary);
+            color: var(--text-dark);
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--gradient-primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        /* Section Styling */
+        .section {
+            background: var(--bg-white);
+            margin-bottom: 2rem;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .section-header .description {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section-content {
+            padding: 2rem;
+        }
+
+        /* Grid Layouts */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+        .grid-4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+        /* Cards */
+        .card {
+            background: var(--bg-light);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+            border-color: var(--secondary-green);
+        }
+
+        .card:hover::before {
+            transform: translateX(0);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            animation: bounce 2s infinite;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            text-align: center;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        /* Soil Cards */
+        .soil-card {
+            position: relative;
+        }
+
+        .soil-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .nutrient {
+            background: var(--bg-white);
+            padding: 0.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .nutrient-label {
+            font-weight: 600;
+            color: var(--primary-green);
+            font-size: 0.8rem;
+        }
+
+        .nutrient-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .crop-compatibility {
+            margin-top: 1rem;
+        }
+
+        .compatibility-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .compatibility-item:last-child {
+            border-bottom: none;
+        }
+
+        .compatibility-bar {
+            width: 60px;
+            height: 8px;
+            background: #E0E0E0;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .compatibility-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        /* Weather Cards */
+        .weather-card {
+            text-align: center;
+        }
+
+        .weather-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .weather-effects {
+            background: var(--bg-white);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .effect-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .effect-item:last-child {
+            border-bottom: none;
+        }
+
+        .effect-label {
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .effect-value {
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .effect-positive { background: #C8E6C9; color: #1B5E20; }
+        .effect-negative { background: #FFCDD2; color: #C62828; }
+        .effect-neutral { background: #FFF9C4; color: #F57F17; }
+
+        /* Tool Cards */
+        .tool-card {
+            text-align: center;
+        }
+
+        .tool-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+            animation: toolFloat 3s ease-in-out infinite;
+        }
+
+        .tool-usage {
+            background: var(--bg-white);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .usage-step {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .usage-step:last-child {
+            border-bottom: none;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: var(--gradient-primary);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-right: 0.5rem;
+        }
+
+        /* Fertilizer Section */
+        .fertilizer-levels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .level-card {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            border: 2px solid var(--border-color);
+        }
+
+        .level-indicator {
+            width: 100%;
+            height: 20px;
+            background: #E0E0E0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .level-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .low-fertilizer { background: linear-gradient(90deg, #FFEB3B, #FFC107); }
+        .optimal-fertilizer { background: linear-gradient(90deg, #4CAF50, #8BC34A); }
+        .high-fertilizer { background: linear-gradient(90deg, #2E7D32, #1B5E20); }
+
+        /* Crop Health Status */
+        .health-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .status-card {
+            background: var(--bg-white);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            border: 2px solid;
+            transition: transform 0.3s ease;
+        }
+
+        .status-card:hover {
+            transform: scale(1.05);
+        }
+
+        .status-healthy { border-color: #4CAF50; }
+        .status-thirsty { border-color: #FFC107; }
+        .status-dry { border-color: #FF9800; }
+        .status-wilted { border-color: #FF5722; }
+        .status-dead { border-color: #795548; }
+
+        .status-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .status-description {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        /* Tips Section */
+        .tips-grid {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .tip-card {
+            background: var(--bg-white);
+            border-left: 4px solid var(--secondary-green);
+            border-radius: 0 10px 10px 0;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .tip-icon {
+            font-size: 2rem;
+            float: left;
+            margin-right: 1rem;
+            margin-top: 0.2rem;
+        }
+
+        .tip-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .tip-content {
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--gradient-primary);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .footer h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer p {
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+            100% { transform: translateY(0px) rotate(360deg); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        @keyframes toolFloat {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-8px) rotate(5deg); }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary-green);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-green);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .nav {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .grid-2,
+            .grid-3,
+            .grid-4 {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>🌱 AgriNova Manual</h1>
+        <p class="subtitle">Complete Guide to Organic Farming Simulator</p>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-container">
+        <nav class="nav">
+            <a href="#soils" class="nav-item">🏞️ Soil Types</a>
+            <a href="#crops" class="nav-item">🌾 Crops</a>
+            <a href="#tools" class="nav-item">🛠️ Farming Tools</a>
+            <a href="#weather" class="nav-item">🌦️ Weather System</a>
+            <a href="#fertilizers" class="nav-item">🧪 Fertilizers</a>
+            <a href="#health" class="nav-item">💚 Crop Health</a>
+            <a href="#tips" class="nav-item">💡 Pro Tips</a>
+        </nav>
+    </div>
+
+    <div class="container">
+        <!-- Soil Types Section -->
+        <div id="soils" class="section">
+            <div class="section-header">
+                <h2>🏞️ Soil Types</h2>
+                <p class="description">Different soils provide unique growing conditions and crop compatibility. Choose wisely for maximum yield!</p>
+            </div>
+            <div class="section-content">
+                <div class="grid grid-2">
+                    <div class="card soil-card">
+                        <div class="card-icon">🏞️</div>
+                        <div class="card-title">Alluvial Soil</div>
+                        <div class="card-subtitle">Fertile river deposits</div>
+                        <p>Rich, fertile soil formed by river sediments. Excellent water retention and balanced nutrients make it ideal for rice cultivation.</p>
+                        
+                        <div class="soil-stats">
+                            <div class="nutrient">
+                                <div class="nutrient-label">Nitrogen</div>
+                                <div class="nutrient-value">40%</div>
+                            </div>
+                            <div class="nutrient">
+                                <div class="nutrient-label">Phosphorus</div>
+                                <div class="nutrient-value">35%</div>
+                            </div>
+                            <div class="nutrient">
+                                <div class="nutrient-label">Potassium</div>
+                                <div class="nutrient-value">45%</div>
+                            </div>
+                        </div>
+
+                        <div class="crop-compatibility">
+                            <strong>Crop Compatibility:</strong>
+                            <div class="compatibility-item">
+                                <span>🌾 Rice</span>
+                                <div class="compatibility-bar">
+                                    <div class="compatibility-fill" style="width: 90%"></div>
+                                </div>
+                            </div>
+                            <div class="compatibility-item">
+                                <span>🌾 Wheat</span>
+                                <div class="compatibility-bar">
+                                    <div class="compatibility-fill" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div class="compatibility-item">
+                                <span>🤍 Cotton</span>
+                                <div class="compatibility-bar">
+                                    <div class="compatibility-fill" style="width: 70%"></div>
+                                </div>
+                            </div>
+                            <div class="compatibility-item">
+                                <span>🥜 Groundnut</span>
+                                <div class="compatibility-bar">
+                                    <div class="compatibility-fill" style="width: 65%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card soil-card">
+                        <div class="card-icon">🌿</div>
+                        <div class="card-title">Black Soil</div>
+                        <div class="card-subtitle">Rich volcanic soil</div>
+                        <p>Dark, nutrient-rich volcanic soil with excellent moisture retention. Perfect for cotton and other cash crops requiring deep soil.</p>
+                        
+                        <div class="soil-stats">
+                            <div class="nutrient">
+                                <div class="nutrient-label">Nitrogen</div>
+                                <div class="nutrient-value">55%</div>
+                            </div>
+                            <div class="nutrient">
+                                <div class="nutrient-label">Phosphorus</div>
+                                <div class="nutrient-value">45%</div>
+                            </div>
+                            <div class="nutrient">
+                                <div class="nutrient-label">Potassium</div>
+                                <div class="nutrient-value">50%</div>
+                            </div>
+                        </div>
+
+                        <div class="crop-compatibility">
+                            <strong>Crop Compatibility:</strong>
+                            <div class="compatibility-item">
+                                <span>🤍 Cotton</span>
+                                <div class="compatibility-bar">
+                                    <div class="compatibility-fill" style="width: 95%"></div>
+                                </div>
+                            </div>
+                            <div class="compatibility-item">
+                                <span>🌾 Wheat</span>
+                                <div class="compatibility-bar">
+                                    <div class="compatibility-fill" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            <div class="compatibility-item">
+                                <span>🌾 Rice</span>
+                                <div class="compatibility-bar">
+                                    <div class="compatibility-fill" style="width: 70%"></div>
+                                </div>
+                            </div>
+                            <div class="compatibility-item">
+                                <span>🥜 Groundnut</span>
+                                <div class="compatibility-bar">
+                                    <div class="compatibility-fill" style="width: 70%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card soil-card">
+                        <div class="card-icon">⛰️</div>
+                        <div class="card-title">Red Soil</div>
+                        <div class="card-subtitle">Iron-rich lateritic soil</div>
+                        <p>Iron oxide gives this soil its characteristic red color. Well-drained but requires careful fertilization for optimal crop growth.</p>
+                        
+                        <div class="soil-stats">
+                            <div class="nutrient">
+                                <div class="nutrient-label">Nitrogen</div>
+                                <div class="nutrient-value">25%</div>
+                            </div>
+                            <div class="nutrient">
+                                <div class="nutrient-label">Phosphorus</div>
+                                <div class="nutrient-value">30%</div>
+                            </div>
+                            <div class="nutrient">
+                                <div class="nutrient-label">Potassium</div>
+                                <div class="nutrient-value">35%</div>
+                            </div>
+                        </div>
+
+                        <div class="crop-compatibility">
+                            <strong>Crop Compatibility:</strong>
+                            <div class="compatibility-item">
+                                <span>🥜 Groundnut</span>
+                                <div class="compatibility-bar">
+                                    <div class="compatibility-fill" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div class="compatibility-item">
+                                <span>🤍 Cotton</span>
+                                <div class="compatibility-bar">
+                                    <div class="compatibility-fill" style="width: 70%"></div>
+                                </div>
+                            </div>
+                            <div class="compatibility-item">
+                                <span>🌾 Wheat</span>
+                                <div class="compatibility-bar">
+                                    <div class="compatibility-fill" style="width: 70%"></div>
+                                </div>
+                            </div>
+                            <div class="compatibility-item">
+                                <span>🌾 Rice</span>
+                                <div class="compatibility-bar">
+                                    <div class="compatibility-fill" style="width: 65%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card soil-card">
+                        <div class="card-icon">🌵</div>
+                        <div class="card-title">Desert Soil</div>
+                        <div class="card-subtitle">Sandy arid soil</div>
+                        <p>Sandy, low-nutrient soil with poor water retention. Challenging for most crops but can be improved with proper fertilization and irrigation.</p>
+                        
+                        <div class="soil-stats">
+                            <div class="nutrient">
+                                <div class="nutrient-label">Nitrogen</div>
+                                <div class="nutrient-value">10%</div>
+                            </div>
+                            <div class="nutrient">
+                                <div class="nutrient-label">Phosphorus</div>
+                                <div class="nutrient-value">12%</div>
+                            </div>
+                            <div class="nutrient">
+                                <div class="nutrient-label">Potassium</div>
+                                <div class="nutrient-value">15%</div>
+                            </div>
+                        </div>
+
+                        <div class="crop-compatibility">
+                            <strong>Crop Compatibility:</strong>
+                            <div class="compatibility-item">
+                                <span>🥜 Groundnut</span>
+                                <div class="compatibility-bar">
+                                    <div class="compatibility-fill" style="width: 70%"></div>
+                                </div>
+                            </div>
+                            <div class="compatibility-item">
+                                <span>🤍 Cotton</span>
+                                <div class="compatibility-bar">
+                                    <div class="compatibility-fill" style="width: 60%"></div>
+                                </div>
+                            </div>
+                            <div class="compatibility-item">
+                                <span>🌾 Wheat</span>
+                                <div class="compatibility-bar">
+                                    <div class="compatibility-fill" style="width: 50%"></div>
+                                </div>
+                            </div>
+                            <div class="compatibility-item">
+                                <span>🌾 Rice</span>
+                                <div class="compatibility-bar">
+                                    <div class="compatibility-fill" style="width: 40%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Crops Section -->
+        <div id="crops" class="section">
+            <div class="section-header">
+                <h2>🌾 Crop Varieties</h2>
+                <p class="description">Each crop has unique growth requirements, profitability, and compatibility with different soil types.</p>
+            </div>
+            <div class="section-content">
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-icon">🌾</div>
+                        <div class="card-title">Rice</div>
+                        <div class="card-subtitle">Water-loving staple crop</div>
+                        <p><strong>Seed Cost:</strong> 8 coins | <strong>Growth Time:</strong> 20 seconds | <strong>Base Price:</strong> 25 coins</p>
+                        <p>Rice requires abundant water and thrives in alluvial soil. High water needs make it vulnerable during droughts but very profitable when well-maintained.</p>
+                        <div style="margin-top: 1rem;">
+                            <strong>Best Soil:</strong> Alluvial (90% yield)<br>
+                            <strong>Water Need:</strong> High (1.2x normal)<br>
+                            <strong>Fertilizer Optimal:</strong> 60-80%
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">🌾</div>
+                        <div class="card-title">Wheat</div>
+                        <div class="card-subtitle">Hardy grain crop</div>
+                        <p><strong>Seed Cost:</strong> 10 coins | <strong>Growth Time:</strong> 15 seconds | <strong>Base Price:</strong> 30 coins</p>
+                        <p>Versatile crop that grows well in various soil types. Moderate water requirements and good disease resistance make it a reliable choice.</p>
+                        <div style="margin-top: 1rem;">
+                            <strong>Best Soil:</strong> Alluvial (85% yield)<br>
+                            <strong>Water Need:</strong> Normal (1.0x)<br>
+                            <strong>Fertilizer Optimal:</strong> 40-70%
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">🤍</div>
+                        <div class="card-title">Cotton</div>
+                        <div class="card-subtitle">Valuable cash crop</div>
+                        <p><strong>Seed Cost:</strong> 15 coins | <strong>Growth Time:</strong> 30 seconds | <strong>Base Price:</strong> 50 coins</p>
+                        <p>High-value crop requiring deep, nutrient-rich soil. Long growth period but excellent returns. Performs best in black soil conditions.</p>
+                        <div style="margin-top: 1rem;">
+                            <strong>Best Soil:</strong> Black (95% yield)<br>
+                            <strong>Water Need:</strong> High (1.5x normal)<br>
+                            <strong>Fertilizer Optimal:</strong> 70-90%
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">🥜</div>
+                        <div class="card-title">Groundnut</div>
+                        <div class="card-subtitle">Drought-resistant legume</div>
+                        <p><strong>Seed Cost:</strong> 6 coins | <strong>Growth Time:</strong> 12 seconds | <strong>Base Price:</strong> 20 coins</p>
+                        <p>Fast-growing, drought-tolerant crop that fixes nitrogen in soil. Excellent for challenging conditions and quick profits.</p>
+                        <div style="margin-top: 1rem;">
+                            <strong>Best Soil:</strong> Red (85% yield)<br>
+                            <strong>Water Need:</strong> Low (0.8x normal)<br>
+                            <strong>Fertilizer Optimal:</strong> 30-60%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tools Section -->
+        <div id="tools" class="section">
+            <div class="section-header">
+                <h2>🛠️ Farming Tools</h2>
+                <p class="description">Master these essential farming tools to maximize your crop production and field efficiency.</p>
+            </div>
+            <div class="section-content">
+                <div class="grid grid-3">
+                    <div class="card tool-card">
+                        <div class="tool-icon">🚜</div>
+                        <div class="card-title">Plough Tool</div>
+                        <div class="card-subtitle">Soil preparation</div>
+                        <p>Essential first step in farming. Creates organic furrows for planting seeds.</p>
+                        <div class="tool-usage">
+                            <div class="usage-step">
+                                <span class="step-number">1</span>
+                                Click and hold mouse button
+                            </div>
+                            <div class="usage-step">
+                                <span class="step-number">2</span>
+                                Drag to create curved furrows
+                            </div>
+                            <div class="usage-step">
+                                <span class="step-number">3</span>
+                                Release to complete ploughing
+                            </div>
+                            <div class="usage-step">
+                                <span class="step-number">4</span>
+                                Tilled soil turns darker
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card tool-card">
+                        <div class="tool-icon">🌱</div>
+                        <div class="card-title">Plant Tool</div>
+                        <div class="card-subtitle">Seed planting</div>
+                        <p>Plants selected crop seeds on ploughed soil. Requires proper spacing between plants.</p>
+                        <div class="tool-usage">
+                            <div class="usage-step">
+                                <span class="step-number">1</span>
+                                Select crop from dropdown
+                            </div>
+                            <div class="usage-step">
+                                <span class="step-number">2</span>
+                                Click on ploughed soil
+                            </div>
+                            <div class="usage-step">
+                                <span class="step-number">3</span>
+                                Maintain 40px spacing
+                            </div>
+                            <div class="usage-step">
+                                <span class="step-number">4</span>
+                                Seeds cost varies by crop
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card tool-card">
+                        <div class="tool-icon">💧</div>
+                        <div class="card-title">Water Tool</div>
+                        <div class="card-subtitle">Irrigation system</div>
+                        <p>Provides essential water to crops. Creates animated droplets and prevents crop dehydration.</p>
+                        <div class="tool-usage">
+                            <div class="usage-step">
+                                <span class="step-number">1</span>
+                                Click near planted crops
+                            </div>
+                            <div class="usage-step">
+                                <span class="step-number">2</span>
+                                45px radius watering area
+                            </div>
+                            <div class="usage-step">
+                                <span class="step-number">3</span>
+                                Animated water droplets
+                            </div>
+                            <div class="usage-step">
+                                <span class="step-number">4</span>
+                                Resets crop hydration timer
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card tool-card">
+                        <div class="tool-icon">✨</div>
+                        <div class="card-title">Fertilizer Tool</div>
+                        <div class="card-subtitle">Nutrient application</div>
+                        <p>Applies fertilizer to boost crop growth. Creates sparkle effects and affects crop color.</p>
+                        <div class="tool-usage">
+                            <div class="usage-step">
+                                <span class="step-number">1</span>
+                                Costs 15 coins per use
+                            </div>
+                            <div class="usage-step">
+                                <span class="step-number">2</span>
+                                50px application radius
+                            </div>
+                            <div class="usage-step">
+                                <span class="step-number">3</span>
+                                Creates sparkle particles
+                            </div>
+                            <div class="usage-step">
+                                <span class="step-number">4</span>
+                                Affects crop color/growth
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card tool-card">
+                        <div class="tool-icon">🌾</div>
+                        <div class="card-title">Harvest Tool</div>
+                        <div class="card-subtitle">Crop collection</div>
+                        <p>Collects mature crops for profit. Click directly on ready-to-harvest plants.</p>
+                        <div class="tool-usage">
+                            <div class="usage-step">
+                                <span class="step-number">1</span>
+                                Wait for crop maturity
+                            </div>
+                            <div class="usage-step">
+                                <span class="step-number">2</span>
+                                Look for golden glow
+                            </div>
+                            <div class="usage-step">
+                                <span class="step-number">3</span>
+                                Click directly on crop
+                            </div>
+                            <div class="usage-step">
+                                <span class="step-number">4</span>
+                                Earn coins based on health
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weather System -->
+        <div id="weather" class="section">
+            <div class="section-header">
+                <h2>🌦️ Weather System</h2>
+                <p class="description">Dynamic weather events create realistic farming challenges and opportunities. Adapt your strategy!</p>
+            </div>
+            <div class="section-content">
+                <div class="grid grid-3">
+                    <div class="card weather-card">
+                        <div class="weather-icon">☀️</div>
+                        <div class="card-title">Clear Weather</div>
+                        <div class="card-subtitle">Optimal conditions</div>
+                        <p>Perfect farming conditions with normal growth rates and water requirements. Baseline for all farming activities.</p>
+                        <div class="weather-effects">
+                            <div class="effect-item">
+                                <span class="effect-label">Growth Rate:</span>
+                                <span class="effect-value effect-neutral">Normal (1.0x)</span>
+                            </div>
+                            <div class="effect-item">
+                                <span class="effect-label">Water Need:</span>
+                                <span class="effect-value effect-neutral">Normal (1.0x)</span>
+                            </div>
+                            <div class="effect-item">
+                                <span class="effect-label">Duration:</span>
+                                <span class="effect-value effect-neutral">Permanent</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card weather-card">
+                        <div class="weather-icon">🌵</div>
+                        <div class="card-title">Drought</div>
+                        <div class="card-subtitle">Water shortage</div>
+                        <p>Severe water shortage causes crops to dry faster. Increase watering frequency to prevent crop death.</p>
+                        <div class="weather-effects">
+                            <div class="effect-item">
+                                <span class="effect-label">Growth Rate:</span>
+                                <span class="effect-value effect-positive">Fast (1.2x)</span>
+                            </div>
+                            <div class="effect-item">
+                                <span class="effect-label">Water Need:</span>
+                                <span class="effect-value effect-negative">High (2.0x)</span>
+                            </div>
+                            <div class="effect-item">
+                                <span class="effect-label">Duration:</span>
+                                <span class="effect-value effect-negative">25 seconds</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card weather-card">
+                        <div class="weather-icon">🌧️</div>
+                        <div class="card-title">Heavy Rain</div>
+                        <div class="card-subtitle">Flooding risk</div>
+                        <p>Excessive rainfall can waterlog crops. Reduce watering to prevent overhydration damage.</p>
+                        <div class="weather-effects">
+                            <div class="effect-item">
+                                <span class="effect-label">Growth Rate:</span>
+                                <span class="effect-value effect-negative">Slow (0.8x)</span>
+                            </div>
+                            <div class="effect-item">
+                                <span class="effect-label">Water Need:</span>
+                                <span class="effect-value effect-positive">Low (0.5x)</span>
+                            </div>
+                            <div class="effect-item">
+                                <span class="effect-label">Duration:</span>
+                                <span class="effect-value effect-neutral">20 seconds</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card weather-card">
+                        <div class="weather-icon">🔥</div>
+                        <div class="card-title">Heatwave</div>
+                        <div class="card-subtitle">Extreme temperatures</div>
+                        <p>High temperatures accelerate growth but dramatically increase water consumption. Monitor closely!</p>
+                        <div class="weather-effects">
+                            <div class="effect-item">
+                                <span class="effect-label">Growth Rate:</span>
+                                <span class="effect-value effect-positive">Very Fast (1.5x)</span>
+                            </div>
+                            <div class="effect-item">
+                                <span class="effect-label">Water Need:</span>
+                                <span class="effect-value effect-negative">Very High (2.5x)</span>
+                            </div>
+                            <div class="effect-item">
+                                <span class="effect-label">Duration:</span>
+                                <span class="effect-value effect-negative">30 seconds</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card weather-card">
+                        <div class="weather-icon">❄️</div>
+                        <div class="card-title">Cold Snap</div>
+                        <div class="card-subtitle">Freezing temperatures</div>
+                        <p>Sudden cold weather slows crop metabolism. Growth nearly stops, but water needs remain normal.</p>
+                        <div class="weather-effects">
+                            <div class="effect-item">
+                                <span class="effect-label">Growth Rate:</span>
+                                <span class="effect-value effect-negative">Very Slow (0.6x)</span>
+                            </div>
+                            <div class="effect-item">
+                                <span class="effect-label">Water Need:</span>
+                                <span class="effect-value effect-neutral">Normal (1.0x)</span>
+                            </div>
+                            <div class="effect-item">
+                                <span class="effect-label">Duration:</span>
+                                <span class="effect-value effect-negative">35 seconds</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fertilizer System -->
+        <div id="fertilizers" class="section">
+            <div class="section-header">
+                <h2>🧪 Fertilizer System</h2>
+                <p class="description">Master the art of fertilization to maximize crop yields. Balance is key - too much can be harmful!</p>
+            </div>
+            <div class="section-content">
+                <div class="fertilizer-levels">
+                    <div class="level-card">
+                        <h3>🟡 Under-fertilized (0-30%)</h3>
+                        <div class="level-indicator">
+                            <div class="level-fill low-fertilizer" style="width: 25%"></div>
+                        </div>
+                        <p><strong>Color:</strong> Yellow-green (#9ACD32)</p>
+                        <p><strong>Growth Rate:</strong> 80% of normal</p>
+                        <p><strong>Yield:</strong> Reduced earnings</p>
+                        <p><strong>Solution:</strong> Apply more fertilizer</p>
+                    </div>
+
+                    <div class="level-card">
+                        <h3>🟢 Optimal (30-70%)</h3>
+                        <div class="level-indicator">
+                            <div class="level-fill optimal-fertilizer" style="width: 60%"></div>
+                        </div>
+                        <p><strong>Color:</strong> Healthy green (#32CD32)</p>
+                        <p><strong>Growth Rate:</strong> 120% of normal</p>
+                        <p><strong>Yield:</strong> 30% bonus earnings</p>
+                        <p><strong>Maintenance:</strong> Perfect balance</p>
+                    </div>
+
+                    <div class="level-card">
+                        <h3>🔵 Over-fertilized (70%+)</h3>
+                        <div class="level-indicator">
+                            <div class="level-fill high-fertilizer" style="width: 85%"></div>
+                        </div>
+                        <p><strong>Color:</strong> Dark blue-green (#006400)</p>
+                        <p><strong>Growth Rate:</strong> 90% of normal</p>
+                        <p><strong>Yield:</strong> 20% penalty</p>
+                        <p><strong>Problem:</strong> Fertilizer burn</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3>🎯 Fertilizer Management Tips</h3>
+                    <div class="tips-grid">
+                        <div class="tip-card">
+                            <div class="tip-icon">💰</div>
+                            <div class="tip-title">Cost Management</div>
+                            <div class="tip-content">
+                                Each fertilizer application costs 15 coins. Apply strategically to maximize return on investment.
+                            </div>
+                        </div>
+
+                        <div class="tip-card">
+                            <div class="tip-icon">📉</div>
+                            <div class="tip-title">Natural Decay</div>
+                            <div class="tip-content">
+                                Fertilizer levels decrease by 0.5% per second naturally. Plan regular applications.
+                            </div>
+                        </div>
+
+                        <div class="tip-card">
+                            <div class="tip-icon">🎯</div>
+                            <div class="tip-title">Application Radius</div>
+                            <div class="tip-content">
+                                Fertilizer affects crops within 50 pixels. Position carefully to cover multiple plants.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Crop Health System -->
+        <div id="health" class="section">
+            <div class="section-header">
+                <h2>💚 Crop Health Status</h2>
+                <p class="description">Monitor crop health closely to prevent losses. Each stage has visual and economic implications.</p>
+            </div>
+            <div class="section-content">
+                <div class="health-status">
+                    <div class="status-card status-healthy">
+                        <div class="status-icon">🌟</div>
+                        <div class="status-name">Healthy</div>
+                        <div class="status-description">Well-watered, optimal conditions</div>
+                        <p style="margin-top: 0.5rem;">
+                            <strong>Color:</strong> Vibrant green<br>
+                            <strong>Earnings:</strong> 120% base price<br>
+                            <strong>Growth:</strong> Normal rate
+                        </p>
+                    </div>
+
+                    <div class="status-card status-thirsty">
+                        <div class="status-icon">💧</div>
+                        <div class="status-name">Thirsty</div>
+                        <div class="status-description">Needs water soon</div>
+                        <p style="margin-top: 0.5rem;">
+                            <strong>Color:</strong> Light green<br>
+                            <strong>Earnings:</strong> 90% base price<br>
+                            <strong>Growth:</strong> 80% rate
+                        </p>
+                    </div>
+
+                    <div class="status-card status-dry">
+                        <div class="status-icon">🌵</div>
+                        <div class="status-name">Dry</div>
+                        <div class="status-description">Dehydrated, urgent care needed</div>
+                        <p style="margin-top: 0.5rem;">
+                            <strong>Color:</strong> Golden yellow<br>
+                            <strong>Earnings:</strong> 70% base price<br>
+                            <strong>Growth:</strong> 50% rate
+                        </p>
+                    </div>
+
+                    <div class="status-card status-wilted">
+                        <div class="status-icon">🥀</div>
+                        <div class="status-name">Wilted</div>
+                        <div class="status-description">Severely dehydrated, drooping</div>
+                        <p style="margin-top: 0.5rem;">
+                            <strong>Color:</strong> Brown/tan<br>
+                            <strong>Earnings:</strong> 50% base price<br>
+                            <strong>Growth:</strong> 20% rate
+                        </p>
+                    </div>
+
+                    <div class="status-card status-dead">
+                        <div class="status-icon">💀</div>
+                        <div class="status-name">Dead</div>
+                        <div class="status-description">No recovery possible</div>
+                        <p style="margin-top: 0.5rem;">
+                            <strong>Color:</strong> Dark brown<br>
+                            <strong>Earnings:</strong> 0 coins<br>
+                            <strong>Growth:</strong> Stopped
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3>⏰ Water Timeline (varies by weather)</h3>
+                    <div class="tips-grid">
+                        <div class="tip-card">
+                            <div class="tip-icon">💧</div>
+                            <div class="tip-title">Thirsty Stage</div>
+                            <div class="tip-content">
+                                Crops become thirsty after 12-18 seconds without water (varies by weather conditions).
+                            </div>
+                        </div>
+
+                        <div class="tip-card">
+                            <div class="tip-icon">🌵</div>
+                            <div class="tip-title">Dry Stage</div>
+                            <div class="tip-content">
+                                Reached after 24-36 seconds without water. Crops start showing stress symptoms.
+                            </div>
+                        </div>
+
+                        <div class="tip-card">
+                            <div class="tip-icon">🥀</div>
+                            <div class="tip-title">Wilted Stage</div>
+                            <div class="tip-content">
+                                After 36-54 seconds without water. Visual drooping effect and severe yield loss.
+                            </div>
+                        </div>
+
+                        <div class="tip-card">
+                            <div class="tip-icon">💀</div>
+                            <div class="tip-title">Death Stage</div>
+                            <div class="tip-content">
+                                After 48-72 seconds without water. Complete crop loss - must replant from scratch.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pro Tips Section -->
+        <div id="tips" class="section">
+            <div class="section-header">
+                <h2>💡 Pro Farming Tips</h2>
+                <p class="description">Advanced strategies and techniques to maximize your farming success and profitability.</p>
+            </div>
+            <div class="section-content">
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <div class="tip-icon">🎯</div>
+                        <div class="tip-title">Optimal Crop Spacing</div>
+                        <div class="tip-content">
+                            Maintain at least 40 pixels between crops to prevent competition for nutrients and ensure proper growth. Overcrowded plants suffer reduced yields.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">🌦️</div>
+                        <div class="tip-title">Weather Adaptation</div>
+                        <div class="tip-content">
+                            During drought, focus on drought-resistant crops like groundnut. In rainy weather, reduce watering frequency to prevent overhydration.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">🏞️</div>
+                        <div class="tip-title">Soil-Crop Matching</div>
+                        <div class="tip-content">
+                            Plant rice in alluvial soil (90% yield), cotton in black soil (95% yield), and groundnut in red soil (85% yield) for maximum profits.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">💰</div>
+                        <div class="tip-title">Economic Strategy</div>
+                        <div class="tip-content">
+                            Start with fast-growing, low-cost crops like groundnut to build capital, then invest in high-value cotton for long-term profits.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">🧪</div>
+                        <div class="tip-title">Fertilizer Timing</div>
+                        <div class="tip-content">
+                            Apply fertilizer immediately after planting for best results. Aim for 50-60% fertilizer level - the optimal range for maximum yield bonus.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">⏰</div>
+                        <div class="tip-title">Water Management</div>
+                        <div class="tip-content">
+                            Check crop status regularly in the sidebar. Water before crops become "dry" to maintain optimal growth rates and prevent yield losses.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">🌱</div>
+                        <div class="tip-title">Growth Monitoring</div>
+                        <div class="tip-content">
+                            Use the growing crops panel to track individual plant health. Mature crops glow golden - harvest immediately for best prices.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">🚜</div>
+                        <div class="tip-title">Field Preparation</div>
+                        <div class="tip-content">
+                            Plough large areas at once using smooth, curved motions. Well-ploughed soil shows darker color and furrow lines for easy identification.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">📊</div>
+                        <div class="tip-title">Profit Maximization</div>
+                        <div class="tip-content">
+                            Healthy crops earn 120% base price, while dead crops earn nothing. Maintaining good health is more profitable than planting more crops.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">🌾</div>
+                        <div class="tip-title">Harvest Timing</div>
+                        <div class="tip-content">
+                            Don't delay harvesting mature crops - they continue consuming water without growing further. Harvest immediately for optimal resource efficiency.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">🔄</div>
+                        <div class="tip-title">Crop Rotation</div>
+                        <div class="tip-content">
+                            After harvesting, you can immediately replant in the same location. Mix fast and slow-growing crops for continuous income streams.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">🎲</div>
+                        <div class="tip-title">Risk Management</div>
+                        <div class="tip-content">
+                            Don't put all resources into one crop type. Diversify with different crops to minimize losses from weather events or poor management.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-content">
+            <h3>🌱 Happy Farming!</h3>
+            <p>Master these techniques to become a successful organic farmer in AgriNova.</p>
+            <p>Remember: Real farming requires patience, observation, and adaptation to nature's challenges.</p>
+            <p style="margin-top: 1rem; opacity: 0.8;">© 2025 AgriNova Farming Simulator - Educational Gaming Experience</p>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav-item').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add scroll-triggered animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards
+        document.querySelectorAll('.card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+
+        // Interactive compatibility bars
+        document.querySelectorAll('.compatibility-fill').forEach(fill => {
+            const width = fill.style.width;
+            fill.style.width = '0%';
+            
+            setTimeout(() => {
+                fill.style.width = width;
+            }, 500);
+        });
+
+        // Interactive fertilizer meters
+        document.querySelectorAll('.level-fill').forEach(fill => {
+            const width = fill.style.width;
+            fill.style.width = '0%';
+            
+            setTimeout(() => {
+                fill.style.width = width;
+            }, 800);
+        });
+    </script>
+</body>
+</html>

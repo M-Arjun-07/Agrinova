@@ -22,6 +22,8 @@ const gameData = {
   }
 };
 
+const weatherTypes = ["sunny", "rainy", "cold", "windy"];
+
 // Game State
 let gameState = {
 
@@ -32,7 +34,7 @@ let gameState = {
   selectedTool: 'plough',
   selectedCrop: 'rice',
   money: gameData.gameConfig.startingMoney,
-  
+  weather: "sunny",
   // Organic field system - NO GRID
   ploughedPaths: [], // Array of path objects with points
   crops: [], // Array of crop objects at specific coordinates
@@ -66,6 +68,19 @@ function generateID() {
   return Date.now() + Math.random().toString(36).substr(2, 9);
 }
 
+function changeWeatherRandomly() {
+  const oldWeather = gameState.weather;
+  let newWeather = oldWeather;
+  while (newWeather === oldWeather) {
+    newWeather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
+  }
+  gameState.weather = newWeather;
+  showMessage(`The weather changed to ${newWeather}!`);
+
+  // Optional: Adjust gameState or gameplay effects here if needed
+  // e.g., slow growth during cold, rainy affects visuals, etc.
+}
+setInterval(changeWeatherRandomly, 25000);
 function adjustBrightness(hex, percent) {
   const num = parseInt(hex.replace("#", ""), 16);
   const amt = Math.round(2.55 * percent);
@@ -141,6 +156,33 @@ function renderSavesPanel(saves) {
     </div>
   `).join('');
 }
+
+function renderWeatherEffects(ctx) {
+  if (!ctx) return;
+  const { weather } = gameState;
+  const canvas = gameState.canvas;
+
+  switch (weather) {
+    case "rainy":
+      ctx.fillStyle = "rgba(64, 164, 223, 0.2)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Additional raindrop effects can be added here
+      break;
+    case "cold":
+      ctx.fillStyle = "rgba(173, 216, 230, 0.1)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      break;
+    case "windy":
+      ctx.fillStyle = "rgba(200, 200, 200, 0.1)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      break;
+    case "sunny":
+    default:
+      // Clear or no effect for sunny
+      break;
+  }
+}
+
 function renderDisasterEffects(ctx) {
   if (gameState.disasters.flood) {
     ctx.fillStyle = "rgba(0, 0, 255, 0.3)";
@@ -545,11 +587,59 @@ function harvestCrop(x, y) {
       gameState.stats.harvested++;
       gameState.stats.totalEarnings += reward;
       
+      let mutationMessage = null;
+
+      if (gameState.weather === "sunny") {
+        if (crop.type === "rice" && Math.random() < 0.3) {
+          mutationMessage = "a drought-tolerant variety of Rice developed under prolonged sunlight";
+        } else if (crop.type === "wheat" && Math.random() < 0.25) {
+          mutationMessage = "a high-gluten Wheat variant resulting from sunny growth conditions";
+        } else if (crop.type === "cotton" && Math.random() < 0.2) {
+          mutationMessage = "a stronger-fiber Cotton type due to extended sunny weather";
+        } else if (crop.type === "groundnut" && Math.random() < 0.3) {
+          mutationMessage = "a rich oil-content Groundnut adapted to sunny conditions";
+        }
+      } else if (gameState.weather === "rainy") {
+        if (crop.type === "rice" && Math.random() < 0.4) {
+          mutationMessage = "a flood-resistant Rice variant nurtured by heavy rains";
+        } else if (crop.type === "wheat" && Math.random() < 0.3) {
+          mutationMessage = "a disease-resistant Wheat type benefiting from rainy conditions";
+        } else if (crop.type === "cotton" && Math.random() < 0.25) {
+          mutationMessage = "a pest-resistant Cotton variety due to rainfall stress";
+        } else if (crop.type === "groundnut" && Math.random() < 0.35) {
+          mutationMessage = "a larger-yield Groundnut variant encouraged by rain";
+        }
+      } else if (gameState.weather === "cold") {
+        if (crop.type === "rice" && Math.random() < 0.2) {
+          mutationMessage = "a cold-tolerant Rice type developed from low temperatures";
+        } else if (crop.type === "wheat" && Math.random() < 0.4) {
+          mutationMessage = "a hardier Wheat strain adapted to cold weather";
+        } else if (crop.type === "cotton" && Math.random() < 0.15) {
+          mutationMessage = "a short-fiber Cotton crop influenced by chilly conditions";
+        } else if (crop.type === "groundnut" && Math.random() < 0.2) {
+          mutationMessage = "a slower-maturing Groundnut type due to cold weather";
+        }
+      } else if (gameState.weather === "windy") {
+        if (crop.type === "rice" && Math.random() < 0.15) {
+          mutationMessage = "a wind-resilient Rice variant with stronger stalks";
+        } else if (crop.type === "wheat" && Math.random() < 0.2) {
+          mutationMessage = "a sturdy Wheat strain bred to withstand wind";
+        } else if (crop.type === "cotton" && Math.random() < 0.1) {
+          mutationMessage = "a compact Cotton variation less affected by wind damage";
+        } else if (crop.type === "groundnut" && Math.random() < 0.15) {
+          mutationMessage = "a deeply-rooted Groundnut variant adapted to windy conditions";
+        }
+      }
+
       // Remove crop
       gameState.crops.splice(i, 1);
       
       updateUI();
-      showMessage(`🎉 Harvested ${cropData.name}! Earned 💰${reward}!`);
+       if (mutationMessage) {
+        showMessage(`Harvested a mutated crop! ${mutationMessage}, Earned ${reward} coins!`);
+      } else {
+        showMessage(`Harvested ${cropData.name}! Earned ${reward} coins!`);
+      }
       
       // Harvest effect
       createHarvestEffect(x, y);
@@ -752,6 +842,8 @@ function renderField() {
   drawCrops();
 
   renderDisasterEffects(ctx);
+  
+  renderWeatherEffects(ctx);
 
 }
 
@@ -925,6 +1017,23 @@ function updateCropGrowth() {
       growthRate *= (crop.growthBoost || 1.5);
     }
 
+    switch (gameState.weather) {
+      case "sunny":
+        growthRate *= 1.0;  // normal growth
+        break;
+      case "rainy":
+        growthRate *= 1.2;  // rain boosts growth
+        break;
+      case "cold":
+        growthRate *= 0.7;  // cold slows growth
+        break;
+      case "windy":
+        growthRate *= 0.9;  // wind slightly slows growth
+        break;
+      default:
+        growthRate *= 1.0;
+    }
+
     // Apply disasters
     if (gameState.disasters.flood) {
       crop.health -= 0.5; // Flood slowly damages crops
@@ -953,7 +1062,8 @@ function updateCropGrowth() {
     // Crop sway animation
     crop.sway = Math.sin(Date.now() * 0.001 + parseInt(crop.id.substr(-3))) * 2;
   });
-
+  
+// Update stats for growing crops
   gameState.stats.growing = gameState.crops.filter(c => c.stage < 3).length;
 }
 
