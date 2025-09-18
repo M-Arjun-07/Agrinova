@@ -140,3 +140,94 @@ E:.
 2. Backend: `cd backend`, `npm install`, add .env vars, `npm start` (runs on localhost:3000).
 3. Test: Use Postman for /login (get token), then /saves (create/load with soil_type).
 4. Next: Integrate frontend Phaser for UI (soil selection, MS Paint-style farm view). Add more game logic (e.g., soil bonuses in score calc).
+***
+
+# Agrinova Project Update — Current Status Summary
+
+## Project Overview
+Agrinova is evolving from a simple farming game into a realistic farming simulator. It currently simulates the full farming cycle — soil selection, crop planting, irrigation, fertilization, pest control, harvesting, and market sales — with sustainability concepts embedded.
+
+***
+
+## Major Functionalities Completed
+
+### Frontend (UI & Gameplay)
+
+- **Soil, Crop & Tool Selection:**  
+  Players choose soil type (e.g., Alluvial, Black) and crops (rice, wheat, cotton, groundnut). Tools like plough, plant, water, fertilizer, and harvest are fully interactive with intuitive UI.  
+
+- **Organic Field Rendering:**  
+  Canvas rendering displays soils with natural textures, ploughed paths, crops with growth stages and animations, and dynamic weather/irrigation effects.
+
+- **Game States & Stats:**  
+  Real-time updates for money, crop growth, stats like planted/growing/harvested counts, and total earnings counter.  
+
+- **Save & Load Farm States:**  
+  Full integration with backend for persistence. Users can save farms (including soil, crop selection, stats, and coin balance), and load them back to restore exact game state. Saves UI updated to list saved farms with load buttons.
+
+- **Dynamic Currency & Nutrients:**  
+  Coins are stored and fetched correctly with saves. Planned addition of nutrient meters (nitrogen, phosphorus, potassium) to track soil health.
+
+***
+
+### Backend (Node.js + Supabase)
+
+- **REST API:**  
+  Functional backend API managing farms (save/load), user data, and leaderboards with endpoints supporting CRUD operations.
+
+- **Authentication:**  
+  Initially secured routes require tokens; for prototype/demo, authentication middleware can be disabled to allow anonymous saving/loading.
+
+- **Row-Level Security (RLS):**  
+  RLS policies managed and temporarily disabled for development. Plans to re-enable with user-based access control when auth is implemented.
+
+- **Schema:**  
+  Database extended with `coins` column for tracking player currency. Saves include fields for soil, crop, choices, stats, etc.
+
+***
+
+### Running the Project
+
+- **Start Backend Server:**
+  ```
+  cd backend
+  npm install
+  npm start
+  ```
+  Runs the API server on `http://localhost:3000`
+
+- **Launch Frontend:**
+  Open `index.html` in the browser (via VS Code Live Server or file protocol).
+
+***
+
+## Next Planned Improvements
+
+- **Soil Nutrient Meters:**  
+  Add visuals and logic for nitrogen, phosphorus, potassium levels affected by watering and fertilizing.
+
+- **Advanced Simulator Features:**  
+  Weather dynamics, soil health monitoring, pest/disease risks, realistic market price fluctuations.
+
+- **UI/UX Enhancements:**  
+  Field analysis mode with charts, crop rotation guides, sustainability scorecards.
+
+- **Codebase Refactoring:**  
+  Modularize frontend files (`app.js` split into logic, UI, API layers) for maintainability and scaling.
+
+***
+
+## Summary
+
+The simulation now supports a full round-trip of farming interaction saved and restored from the backend with coin balances properly reflected. The UI is intuitive, the backend solid, and the groundwork for advanced simulation features is being laid.
+
+Please ensure to:
+- Run backend first with `npm start`
+- Open frontend `index.html` to play and test
+- Use the save/load UI panel to persist and restore game state  
+
+Looking forward to your contributions to the upcoming features!
+
+***
+
+This prompt captures the current project progress and instructions clearly for the team to continue seamlessly.
