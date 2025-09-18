@@ -59,7 +59,7 @@ app.get('/user', authMiddleware, async (req, res) => {
 app.get('/saves', async (req, res) => {
   const { data, error } = await supabase
     .from('farms')
-    .select('id, save_name, soil_type, created_at, sustainability_score')
+    .select('id, save_name, soil_type, created_at, sustainability_score, coins')
     // .eq('user_id', req.user.id)
     .order('created_at', { ascending: false });
   if (error) return res.status(400).json({ error: error.message });
@@ -68,7 +68,7 @@ app.get('/saves', async (req, res) => {
 
 // Create new save - requires auth
 app.post('/saves', async (req, res) => {
-  const { save_name = 'New Farm', soil_type, crop_type, choices } = req.body;
+  const { save_name = 'New Farm', soil_type, crop_type, choices, coins } = req.body;
   if (!soil_type) return res.status(400).json({ error: 'soil_type required' });
 
   let sustainability_score = 0;
@@ -83,6 +83,7 @@ app.post('/saves', async (req, res) => {
       soil_type,
       crop_type,
       choices,
+      coins,
       sustainability_score,
       yield: Math.floor(sustainability_score * Math.random() * 10) + 50,
     })
@@ -92,12 +93,12 @@ app.post('/saves', async (req, res) => {
 });
 
 // Get specific save - requires auth
-app.get('/saves/:id', authMiddleware, async (req, res) => {
+app.get('/saves/:id', async (req, res) => {
   const { data, error } = await supabase
     .from('farms')
     .select('*')
     .eq('id', req.params.id)
-    .eq('user_id', req.user.id)
+    // .eq('user_id', req.user.id)
     .single();
   if (error) return res.status(400).json({ error: error.message });
   if (!data) return res.status(404).json({ error: 'Save not found' });

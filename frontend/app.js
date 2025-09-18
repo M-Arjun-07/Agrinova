@@ -124,12 +124,13 @@ function renderSavesPanel(saves) {
   }
   panel.innerHTML = saves.map(save => `
     <div class="save-entry">
-      <div class="save-title">${save.savename || 'Unnamed Farm'}</div>
+      <div class="save-title">${save.save_name || 'Unnamed Farm'}</div>
       <div class="save-meta">
-        <span>${save.soiltype || 'Unknown Soil'}</span>
-        <span>Score: ${save.sustainabilityscore || 0}</span>
-        <span>${new Date(save.createdat).toLocaleString()}</span>
+        <span>${save.soil_type || 'Unknown Soil'}</span>
+        <span>Score: ${save.sustainability_score || 0}</span>
+        <span>${new Date(save.created_at).toLocaleString()}</span>
       </div>
+      <button onclick="loadSaveById('${save.id}')">Load</button>
     </div>
   `).join('');
 }
@@ -139,6 +140,34 @@ async function loadSaves() {
   const saves = await getSaves();
   renderSavesPanel(saves);
 }
+
+// Load save by id
+async function loadSaveById(saveId) {
+  try {
+    const res = await fetch(`http://localhost:3000/saves/${saveId}`);
+    if (!res.ok) throw new Error('Failed to fetch save');
+    const save = await res.json();
+
+    // Overwrite gameState with loaded save
+    gameState.selectedSoil = save.soil_type;
+    gameState.selectedCrop = save.crop_type;
+    gameState.money = save.coins ?? gameData.gameConfig.startingMoney;
+    gameState.ploughedPaths = save.ploughedPaths ?? [];
+    gameState.crops = save.crops ?? [];
+    gameState.stats = save.stats ?? { planted: 0, growing: 0, harvested: 0, totalEarnings: 0 };
+    // Add more fields as needed
+
+    // Re-render everything to reflect loaded state
+    renderField();
+    updateUI();
+    updateGrowingCropsPanel();
+    showMessage('Loaded save: ' + (save.save_name || 'Unnamed Farm'));
+  } catch (err) {
+    console.error('Error loading save:', err);
+    showMessage('Failed to load save.');
+  }
+}
+
 
 // Handler to save current farm
 async function saveCurrentFarm() {
@@ -151,7 +180,7 @@ async function saveCurrentFarm() {
       irrigation: 'drip',
       pestcontrol: 'natural',
     },
-    stats: {...gameState.stats}
+    coins: gameState.money
   };
   const result = await createSave(saveObj);
   if (result && !result.error) {
