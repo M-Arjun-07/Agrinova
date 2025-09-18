@@ -51,7 +51,14 @@ let gameState = {
   isMouseDown: false,
   currentPath: [],
   lastMousePos: {x: 0, y: 0},
-  gameLoopRunning: false
+  gameLoopRunning: false,
+
+  disasters: {
+    flood: false,
+    pests: false,
+    wind: false
+  },
+
 };
 
 // Utility Functions
@@ -134,6 +141,18 @@ function renderSavesPanel(saves) {
     </div>
   `).join('');
 }
+function renderDisasterEffects(ctx) {
+  if (gameState.disasters.flood) {
+    ctx.fillStyle = "rgba(0, 0, 255, 0.3)";
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  }
+  if (gameState.disasters.wind) {
+    ctx.fillStyle = "rgba(200, 200, 200, 0.2)";
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  }
+  // Pests don’t change background, handled in growth
+}
+
 
 // Fetch and show saves in UI
 async function loadSaves() {
@@ -540,6 +559,35 @@ function harvestCrop(x, y) {
   
   showMessage("No mature crops here to harvest!");
 }
+
+// --- DISASTER CHALLENGES ---
+function triggerFlood() {
+  gameState.disasters.flood = true;
+  showMessage("🌊 Flood has started! Crops may drown...");
+  setTimeout(() => {
+    gameState.disasters.flood = false;
+    showMessage("✅ Flood ended. Back to normal.");
+  }, 15000); // 15 sec flood
+}
+
+function triggerPests() {
+  gameState.disasters.pests = true;
+  showMessage("🐛 Pests are attacking the crops!");
+  setTimeout(() => {
+    gameState.disasters.pests = false;
+    showMessage("✅ Pests cleared.");
+  }, 12000); // 12 sec pests
+}
+
+function triggerWinds() {
+  gameState.disasters.wind = true;
+  showMessage("💨 Heavy winds are damaging crops!");
+  setTimeout(() => {
+    gameState.disasters.wind = false;
+    showMessage("✅ Winds calmed down.");
+  }, 10000); // 10 sec winds
+}
+
 function checkGrowth(crop) {
   if (crop.growthPoints >= crop.thresholds.sprout && crop.stage === 0) {
     crop.stage = 1; // seed → sprout
@@ -702,6 +750,9 @@ function renderField() {
   
   // Draw crops
   drawCrops();
+
+  renderDisasterEffects(ctx);
+
 }
 
 function drawSoilBackground() {
@@ -865,50 +916,47 @@ function updateCropGrowth() {
   gameState.crops.forEach(crop => {
     const cropData = gameData.crops[crop.type];
 
-    // Skip growth if no external help
-    if (!crop.watered && !crop.fertilized) {
-      return; // stays in current stage until acted on
+    if (!crop.watered) return; // Only water starts growth
+
+    let growthRate = 1;
+
+    // Fertilizer boosts growth if already watered
+    if (crop.fertilized) {
+      growthRate *= (crop.growthBoost || 1.5);
     }
 
-    // Calculate growth rate
-    let growthRate = 0; // default no growth
-    if (crop.watered) growthRate += 0.5;        // watered gives growth
-    if (crop.fertilized) growthRate += 1.0;     // fertilizer gives stronger boost
-
-    // Increase growth progress proportional to rate
-    crop.growthProgress = Math.min(1, crop.growthProgress + (growthRate / cropData.growthTime) * 1000);
-
-    // Update size visually
-    crop.size = 2 + (crop.growthProgress * 18);
-
-    // Stage calculation
-    if (crop.growthProgress < 0.2) {
-      crop.stage = 0; // seed
-    } else if (crop.growthProgress < 0.5) {
-      crop.stage = 1; // sprout
-    } else if (crop.growthProgress < 0.8) {
-      crop.stage = 2; // young plant
-    } else {
-      crop.stage = 3; // mature
+    // Apply disasters
+    if (gameState.disasters.flood) {
+      crop.health -= 0.5; // Flood slowly damages crops
+      growthRate *= 0.5;  // Growth slows
+    }
+    if (gameState.disasters.pests) {
+      crop.health -= 1;   // Pests eat crops
+      growthRate *= 0.7;
+    }
+    if (gameState.disasters.wind) {
+      crop.health -= 0.2; // Winds reduce health
+      growthRate *= 0.8;
     }
 
-    // Add natural sway effect
+    // Keep health within 0–100
+    crop.health = Math.max(0, Math.min(100, crop.health));
+
+    // Growth progress only if healthy
+    if (crop.health > 0) {
+      const timeGrown = Date.now() - crop.plantedTime;
+      crop.growthProgress = Math.min(1, (timeGrown * growthRate) / cropData.growthTime);
+      crop.size = 2 + (crop.growthProgress * 18);
+      crop.stage = Math.floor(crop.growthProgress * 4);
+    }
+
+    // Crop sway animation
     crop.sway = Math.sin(Date.now() * 0.001 + parseInt(crop.id.substr(-3))) * 2;
-
-    // Reset watered over time
-    if (crop.watered && Math.random() < 0.05) {
-      crop.watered = false;
-    }
-
-    // Reset fertilizer when duration ends
-    if (crop.fertilized && crop.fertilizedTime && Date.now() - crop.fertilizedTime > crop.fertilizerDuration) {
-      crop.fertilized = false;
-    }
   });
 
-  // Update stats
   gameState.stats.growing = gameState.crops.filter(c => c.stage < 3).length;
 }
+
 
 
 
