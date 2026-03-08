@@ -59,8 +59,3 @@ Grow & harvest crops
 
 Sell crops in market at changing rates
 
-📅 Roadmap
-
-Prototype (First Round): Basic farming cycle (soil → crop → plough → water → harvest → sell)
-
-Future: Add fertilizers, pests, weather effects, and upgrades
